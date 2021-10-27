@@ -1,0 +1,124 @@
+def show_menu():
+    print("1.Citire date")
+    print("2.Determinare cea mai lunga subsecventa cu proprietatea ca toate numerele sunt divizibile cu k ")
+    print("3.Determinare cea mai lunga subsecventa cu proprietatea ca toate numerele sale sunt intr o progresie aritmetica ")
+    print("4.Determinare cea mai lunga subsecventa cu proprietatea ca media numerelor nu depășește o valoare citită")
+    print("x.Exit")
+
+
+def read_list():
+    lst = []
+    lst_str = input("Introduceti numerele listei separate prin cate un spatiu: ")
+    lst_str_split = lst_str.split(' ')
+    for num_str in lst_str_split:
+        lst.append(int(num_str))
+    return lst
+
+
+def get_longest_div_k(lst,k):
+    """
+    Determina cea mai lunga subsecventa in care toate numerele sunt divizibile cu k 
+    Input:
+    Lista de numere intregi in care se cauta subsecventa
+    Output:
+    Cea mai lunga subsecventa care satisface proprietatea data
+    """
+    n = len(lst)
+    result = []
+    for st in range(n):
+        for dr in range(st, n):
+            all_even = True
+            for num in lst[st:dr + 1]:
+                if num % k != 0:
+                    all_even = False
+                    break
+            if all_even:
+                if dr - st + 1 > len(result):
+                    result = lst[st:dr + 1]
+    return result
+
+
+def test_get_longest_div_k():
+    assert get_longest_div_k([2, 6, 7, 8, 10, 12, 14, 31],2) == [8, 10, 12, 14]
+    assert get_longest_div_k([11, 13, 27, 53, 409],7) == []
+
+
+def get_longest_arithmetic_progression(lst):
+    if len(lst) == 0:  # daca lista data ca parametru nu are elemente, nici lista de la raspuns nu are
+        return []
+
+    if len(lst) == 1:
+        return [lst[0]]
+
+    n = len(lst)
+    ans = []
+
+    for i in range(0, n):
+        for j in range(i + 1, n):
+            current = [lst[i], lst[j]]
+            last_elem = lst[j]
+            ratio = lst[j] - lst[i]
+            for k in range(j + 1, n):
+                if lst[k] - last_elem == ratio:
+                    last_elem = lst[k]
+                    current.append(lst[k])
+            if len(current) > len(ans):
+                ans = current[:]
+
+    return ans
+
+
+def test_get_longest_arithmetic_progression():
+    assert get_longest_arithmetic_progression([7,2,3,4,5,6,9]) == [2,3,4,5,6]
+
+
+def get_longest_average_below(lst, average):
+    lst.sort()
+    current_sum = 0
+    cnt = 0
+    ans = []
+    for el in lst:
+        if ((current_sum + el) / (cnt + 1) - average) > 0.00001:
+            return ans
+        ans.append(el)
+        current_sum+=el
+        cnt+=1
+    return ans
+
+def test_get_longest_average_below():
+    assert test_get_longest_average_below([2,4,6],8) == [2,4,6]
+    assert test_get_longest_average_below([2,8,6],8) == []
+
+
+def main():
+    lst = []
+    while True:
+        show_menu()
+        opt = input('Optiunea: ')
+        if opt == '1':
+            lst = read_list()
+        elif opt == '2':
+            k= int(input('Dati k'))
+            all_even = get_longest_div_k(lst,k)
+            if len(all_even) != 0:
+                print("Cea mai lunga subsecventa cu toate numerele divizibile cu k: ", all_even)
+            else:
+                print("Lista data nu contine numere divizibile cu k")
+        elif opt == '3':
+            g = get_longest_arithmetic_progression(lst)
+            print("Cea mai lunga subsecventa cu toate numerele intr o progresie aritmetica: ",g)
+        elif opt == '4':
+            e= int(input('Dati valoarea'))
+            li=get_longest_average_below(lst,e)
+            print("Cea mai lunga subsecventa cu media numerelor nu depășește o valoare citită.: ",li )
+        elif opt == 'x':
+            break
+        else:
+            print('Optiune invalida')
+
+
+if __name__ == '__main__':
+    test_get_longest_div_k()
+    test_get_longest_arithmetic_progression()
+   
+    main()
